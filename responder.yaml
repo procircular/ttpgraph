@@ -1,0 +1,49 @@
+id: responder-capture
+info:
+  name: Use responder to capture traffic
+  author: Bobby Kuzma
+  version: 1
+requirements:
+  - name: Domain controller visible from an attacker controlled machine
+    sourcenode:
+      type: host
+      matchers:
+        - type: kv
+          property: compromised
+          value: true
+          operator: ==
+    destinationnode:
+      type: service
+      matchers:
+        - type: kv
+          property: service
+          value: smb
+          operator: startswith
+    edge:
+      type: visible_to
+  - name: Domain controller running SMB
+    sourcenode:
+      type: service
+      matchers:
+        - type: kv
+          property: service
+          value: smb
+          operator: startswith
+    destinationnode:
+      type: host
+      export: domaincontroller
+      matchers:
+        - type: kv
+          property: cpe
+          value: "cpe:2.3:o:microsoft:windows_server"
+          operator: startswith
+    edge:
+      type: running_on
+execution:
+  command: responder -I eth0
+outcome:
+  node:
+    type: user
+    properties:
+      - username
+      - identityhash

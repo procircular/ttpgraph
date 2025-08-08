@@ -1,0 +1,29 @@
+id: netexec-spooler
+info:
+  name: Use netexec to find vulnerable spoolers
+  author: Bobby Kuzma
+  version: 1
+requirements:
+  - name: Domain controller visible from an attacker controlled machine
+    sourcenode:
+      type: host
+      matchers:
+        - type: kv
+          property: compromised
+          value: true
+          operator: ==
+    destinationnode:
+      type: service
+      export: target
+      matchers:
+        - type: kv
+          property: service
+          value: smb
+          operator: startswith
+    edge:
+      type: visible_to
+execution:
+  command: netexec smb $target.ip -M spooler
+outcome:
+  node:
+    type: vulnerability
